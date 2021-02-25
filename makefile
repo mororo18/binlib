@@ -1,6 +1,6 @@
 build:
-	gcc $(FLAG) -o binlib.o -c binlib.c 
-	gcc $(FLAG) main.c binlib.o
+	gcc -g -o binlib.o -c binlib.c 
+	gcc main.c binlib.o -g
 
 clean:
 	rm a.out
