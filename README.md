@@ -1,4 +1,4 @@
-## binary-math
+## binaries-library
 
 funcs TODO:
 - signed ints;
