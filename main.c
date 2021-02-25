@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "bmath.h"
+#include "binlib.h"
 
 int main(){
 	bin_int8_t a = bin_assign("00001011", 8);

@@ -1,7 +1,7 @@
-#ifndef _BAMTH_H
-#define _BAMTH_H
+#ifndef _BINLIB_H
+#define _BINLIB_H
 
-#include "bmath.h"
+#include "binlib.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
