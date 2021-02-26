@@ -77,26 +77,34 @@ void * bin_assign(const char * src){
     }
 }
 
-static int max(int a, int b){
-    int tbl[] = {a, b};
-
-    return tbl[b > a];
+void bin_bit_print(bool * bit, int sz){
+    for(int i = 0; i < sz; i++)
+        printf("%d", bit[i]);
+    printf("\n");
 }
 
-static void bin_bit_sum(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
-    int sum;
+static void bin_bit_add(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
+    int total;
     int rmd = 0;
     for(int i = 0; i < size; i++){
-        sum = a_bit[i] + b_bit[i] + rmd;	
+        total = a_bit[i] + b_bit[i] + rmd;	
 
-        if(sum < 2){
-            dest_bit[i] = sum;
+        if(total < 2){
+            dest_bit[i] = total;
             rmd = 0;
         }else{
-            dest_bit[i] = sum % 2;
+            dest_bit[i] = total % 2;
             rmd = 1;
         }
     }
+
+    //bin_bit_print(a_bit, size);
+    //bin_bit_print(b_bit, size);
+}
+
+static void bin_bit_clear(bool * bit, int sz){
+    for(int i = 0; i < sz; i++)
+        bit[i] = 0;
 }
 
 void * bin_int_resize(void * a, int size_new){
@@ -106,6 +114,7 @@ void * bin_int_resize(void * a, int size_new){
         case 8:
             {
                 bin_int8_t total = malloc(sizeof(struct rg_8bit));
+                bin_bit_clear(total->bit, 8);
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 8;
                 return total;
@@ -113,6 +122,7 @@ void * bin_int_resize(void * a, int size_new){
         case 16:
             {
                 bin_int16_t	total = malloc(sizeof(struct rg_16bit));
+                bin_bit_clear(total->bit, 16);
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 16;
                 return total;
@@ -120,13 +130,16 @@ void * bin_int_resize(void * a, int size_new){
         case 32:
             {
                 bin_int32_t total = malloc(sizeof(struct rg_32bit));
-                memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
+                bin_bit_clear(total->bit, 32);
+                memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz*sizeof(bool));
+                //bin_bit_print((*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 32;
                 return total;
             }
         case 64:
             {
                 bin_int64_t total = malloc(sizeof(struct rg_64bit));
+                bin_bit_clear(total->bit, 64);
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 64;
                 return total;
@@ -134,15 +147,27 @@ void * bin_int_resize(void * a, int size_new){
     }
 }
 
-void * bin_int_sum(void * a, void * b){
+static int bin_int_size(void * a){
+    bin_intn_t * a_adr = &a;
+    int a_size = (*a_adr)->sz;
+
+    return a_size;
+}
+
+static int bin_int_size_larger(void * a, void * b){
     bin_intn_t * a_adr = &a;
     bin_intn_t * b_adr = &b;
 
-    int a_size = (*a_adr)->sz;
-    int b_size = (*b_adr)->sz;
-    int size_max = max(a_size, b_size); 
-    //printf("size max %d\n", b_size);
-    //printf("size max %d\n", a_size);
+    int a_size = bin_int_size(a);
+    int b_size = bin_int_size(b);
+    int tbl[] = {a_size, b_size};
+
+    return tbl[b_size > a_size];
+}
+
+void * bin_int_add(void * a, void * b){
+
+    int size_max = bin_int_size_larger(a, b);
 
     switch(size_max){
         case 8:
@@ -151,7 +176,7 @@ void * bin_int_sum(void * a, void * b){
                 bin_int8_t d = bin_int_resize(b, 8);
                 bin_int8_t total = malloc(sizeof(struct rg_8bit));
                 total->sz = 8;
-                bin_bit_sum(total->bit, c->bit, d->bit, total->sz);
+                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
                 bin_clear(&c);
                 bin_clear(&d);
                 return total;
@@ -162,7 +187,7 @@ void * bin_int_sum(void * a, void * b){
                 bin_int16_t d = bin_int_resize(b, 16);
                 bin_int16_t total = malloc(sizeof(struct rg_16bit));
                 total->sz = 16;
-                bin_bit_sum(total->bit, c->bit, d->bit, total->sz);
+                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
                 bin_clear(&c);
                 bin_clear(&d);
                 return total;
@@ -173,7 +198,7 @@ void * bin_int_sum(void * a, void * b){
                 bin_int32_t d = bin_int_resize(b, 32);
                 bin_int32_t total = malloc(sizeof(struct rg_32bit));
                 total->sz = 32;
-                bin_bit_sum(total->bit, c->bit, d->bit, total->sz);
+                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
                 bin_clear(&c);
                 bin_clear(&d);
                 return total;
@@ -184,12 +209,50 @@ void * bin_int_sum(void * a, void * b){
                 bin_int64_t d = bin_int_resize(b, 64);
                 bin_int64_t total = malloc(sizeof(struct rg_64bit));
                 total->sz = 64;
-                bin_bit_sum(total->bit, c->bit, d->bit, total->sz);
+                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
                 bin_clear(&c);
                 bin_clear(&d);
                 return total;
             }
     }
+}
+
+void bin_int_add_print(void * a, void * b){
+    void * bigger;
+    void * smaller;
+
+    int bigger_size;
+    int a_size = bin_int_size(a);
+    int b_size = bin_int_size(b);
+    int dif;
+
+    bin_int64_t result = bin_int_add(a, b);
+
+    if(a_size > b_size){
+        dif = a_size - b_size;
+        dif /= 8;
+
+        bigger = a;
+        smaller = b;
+        bigger_size = a_size;
+
+    }else{
+
+        dif = b_size - a_size;
+        dif /= 8;
+        bigger = b;
+        smaller = a;
+        bigger_size = b_size;
+    }
+
+    printf("\t");                                   bin_print(bigger);
+    printf("      + "); while(dif--) printf("\t");  bin_print(smaller);
+    printf("\t");       while(bigger_size--) printf("="); printf("\n");
+    printf("\t");                                   bin_print(result);
+    printf("\n");
+
+    bin_clear(&result);
+
 }
 
 #endif

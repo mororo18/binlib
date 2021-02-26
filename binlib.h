@@ -26,4 +26,5 @@ typedef struct rg_64bit * bin_int64_t;
 
 void bin_print(void *ar);
 void * bin_assign(const char * src);
-void * bin_int_sum(void * a, void * b);
+void * bin_int_add(void * a, void * b);
+void  bin_int_add_print(void * a, void * b);
