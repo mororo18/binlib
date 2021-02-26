@@ -255,4 +255,58 @@ void bin_int_add_print(void * a, void * b){
 
 }
 
+unsigned bin_to_uint(void * a){
+    unsigned a_int = 0;
+    int a_size = bin_int_size(a);
+    bin_intn_t * a_adr = &a;
+
+    for(int i = 0; i < a_size; i++)
+        a_int += (*a_adr)->bit[i] << i;
+
+    return a_int;
+}
+
+void bin_bit_invert(bool * bit, int sz){
+    for(int i = 0; i < sz; i++)
+        bit[i] = !bit[i];
+}
+
+int bin_two_complement(void * a){
+    int a_size = bin_int_size(a);
+    bin_intn_t * a_adr = &a;
+
+    bool * bit = (*a_adr)->bit;
+    bool sign = bit[a_size-1];
+
+    if(sign){
+        bool bit_complement[a_size];
+        bin_bit_clear(bit_complement, a_size);
+        bit_complement[0] = 1;
+
+        bit[a_size-1] = 0;
+        bin_bit_invert(bit, a_size-1);
+        bin_bit_add(bit, bit, bit_complement, a_size);
+
+        int int_signed = (-1) * bin_to_uint(a);
+
+        return int_signed;
+        
+    }else{
+
+    }
+}
+
+int bin_to_int(void * a){
+    int a_int = 0;
+    int a_size = bin_int_size(a);
+    bin_intn_t * a_adr = &a;
+
+    bool sign = (*a_adr)->bit[a_size-1];
+
+    if(sign)
+        return bin_two_complement(a);
+    else
+        return bin_to_uint(a);
+}
+
 #endif
