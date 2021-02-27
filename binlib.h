@@ -24,11 +24,15 @@ typedef struct rg_16bit * bin_int16_t;
 typedef struct rg_32bit * bin_int32_t;
 typedef struct rg_64bit * bin_int64_t;
 
-//typedef unsigned uint;
 
-void bin_print(void *ar);
-void * bin_assign(const char * src);
-void * bin_int_add(void * a, void * b);
-void  bin_int_add_print(void * a, void * b);
+void *  bin_int_assign(const char *); 
+void    bin_clear(void **);
+
+void    bin_print(void *);
+
+void *  bin_int_add(void * , void * );
+void    bin_int_add_print(void * , void * );
 unsigned bin_to_uint(void *);
-int bin_to_int(void *);
+int     bin_to_int(void *);
+void *  bin_from_uint(unsigned a_int, int rg_size);
+void *  bin_from_int(int a_int, int rg_size);

@@ -36,11 +36,11 @@ static void str_to_bool(const char * src, bool * ar, int sz){
 
 }
 
-void * bin_assign(const char * src){
+void * bin_int_assign(const char * src){
     int size = strlen(src);
 
     if(size % 8){
-        fprintf(stderr, "[!!] error: in function \033[1m\'bin_assign\'\033[0m.\n"
+        fprintf(stderr, "[!!] error: in function \033[1m\'bin_int_assign\'\033[0m.\n"
                 "     Invalid lenght={\033[1;31m%d\033[0m} of the passed string={\033[1;31m%s\033[0m}.\n", size, src);
         exit(1);
     }
@@ -132,7 +132,6 @@ void * bin_int_resize(void * a, int size_new){
                 bin_int32_t total = malloc(sizeof(struct rg_32bit));
                 bin_bit_clear(total->bit, 32);
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz*sizeof(bool));
-                //bin_bit_print((*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 32;
                 return total;
             }
@@ -307,6 +306,47 @@ int bin_to_int(void * a){
         return bin_two_complement(a);
     else
         return bin_to_uint(a);
+}
+
+void * bin_from_uint(unsigned a_int, int rg_size){
+    char buff[rg_size+1];
+    int quoc = a_int;
+    int i = rg_size;
+    bool rmd;
+
+    for(;;){
+        rmd = quoc % 2;
+        quoc /= 2;
+        buff[--i] = rmd + '0';
+
+        if(!i)
+            break;
+    }
+
+    buff[rg_size] = '\0';
+
+    return bin_int_assign(buff);
+}
+
+void * bin_from_int(int a_int, int rg_size){
+    bin_intn_t temp;
+    if(a_int < 0){
+        temp = bin_from_uint((-1)* a_int, rg_size);
+        bin_bit_invert(temp->bit, temp->sz);
+
+        bool comp[rg_size];
+        bin_bit_clear(comp, rg_size);
+        comp[0] = 1;
+
+        bin_bit_add(temp->bit, temp->bit, comp, rg_size);
+
+    }else{
+
+        temp = bin_from_uint(a_int, rg_size);
+
+    }
+
+    return temp;
 }
 
 #endif
