@@ -44,6 +44,37 @@ static void str_to_bool(const char * src, bool * ar, int sz){
 
 }
 
+static void * bin_int_malloc(int size){
+    bin_intn_t total;
+
+    switch(size){
+        case 8:
+            {
+                total = malloc(sizeof(struct rg_8bit));
+                break;
+            }
+        case 16:
+            {
+                total = malloc(sizeof(struct rg_16bit));
+                break;
+            }
+        case 32:
+            {
+                total = malloc(sizeof(struct rg_32bit));
+                break;
+            }
+        case 64:
+            {
+                total = malloc(sizeof(struct rg_64bit));
+                break;
+            }
+    }
+
+    total->sz = size;
+
+    return total;
+}
+
 void * bin_int_assign(const char * bin_str){
     char * src = bin_str;
     int size = strlen(src);
@@ -54,36 +85,10 @@ void * bin_int_assign(const char * bin_str){
         exit(1);
     }
 
-    switch(size){
-        case 8:
-            {
-                bin_int8_t value = malloc(sizeof(struct rg_8bit));
-                str_to_bool(src, value->bit, size);
-                value->sz = size;
-                return value;
-            }
-        case 16:
-            {
-                bin_int16_t	value = malloc(sizeof(struct rg_16bit));
-                str_to_bool(src, value->bit, size);
-                value->sz = size;
-                return value;
-            }
-        case 32:
-            {
-                bin_int32_t value = malloc(sizeof(struct rg_32bit));
-                str_to_bool(src, value->bit, size);
-                value->sz = size;
-                return value;
-            }
-        case 64:
-            {
-                bin_int64_t value = malloc(sizeof(struct rg_64bit));
-                str_to_bool(src, value->bit, size);
-                value->sz = size;
-                return value;
-            }
-    }
+    bin_intn_t value = bin_int_malloc(size);
+    str_to_bool(src, value->bit, size);
+
+    return value;
 }
 
 static void bin_bit_print(bool * bit, int sz){
@@ -120,52 +125,24 @@ static void bin_bit_invert(bool * bit, int sz){
 }
 
 void * bin_int_resize(void * a, int size_new){
+    bin_intn_t total;
     bin_intn_t * a_adr = &a;
-    int a_size = (*a_adr)->sz;
 
-    switch(size_new){
-        case 8:
-            {
-                bin_int8_t total = malloc(sizeof(struct rg_8bit));
-                bin_bit_clear(total->bit, 8);
-                if((*a_adr)->bit[a_size - 1])
-                    bin_bit_invert(total->bit, 8); 
-                memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
-                total->sz = 8;
-                return total;
-            }
-        case 16:
-            {
-                bin_int16_t	total = malloc(sizeof(struct rg_16bit));
-                bin_bit_clear(total->bit, 16);
-                if((*a_adr)->bit[a_size - 1])
-                    bin_bit_invert(total->bit, 16); 
-                memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
-                total->sz = 16;
-                //bin_print(total);
-                return total;
-            }
-        case 32:
-            {
-                bin_int32_t total = malloc(sizeof(struct rg_32bit));
-                bin_bit_clear(total->bit, 32);
-                if((*a_adr)->bit[a_size - 1])
-                    bin_bit_invert(total->bit, 32); 
-                memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz*sizeof(bool));
-                total->sz = 32;
-                return total;
-            }
-        case 64:
-            {
-                bin_int64_t total = malloc(sizeof(struct rg_64bit));
-                bin_bit_clear(total->bit, 64);
-                if((*a_adr)->bit[a_size - 1])
-                    bin_bit_invert(total->bit, 64); 
-                memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
-                total->sz = 64;
-                return total;
-            }
-    }
+    total = bin_int_malloc(size_new);
+
+    int a_size = (*a_adr)->sz;
+    bool * a_bit = (*a_adr)->bit;
+    bool a_sign = a_bit[a_size - 1];
+
+
+    bin_bit_clear(total->bit, size_new);
+    if(a_sign)
+        bin_bit_invert(total->bit, size_new); 
+
+    memcpy(total->bit, a_bit, a_size);
+    total->sz = size_new;
+
+    return total;
 }
 
 static int bin_int_size(void * a){
@@ -190,52 +167,16 @@ void * bin_int_add(void * a, void * b){
 
     int size_max = bin_int_size_larger(a, b);
 
-    switch(size_max){
-        case 8:
-            {
-                bin_int8_t c = bin_int_resize(a, 8);
-                bin_int8_t d = bin_int_resize(b, 8);
-                bin_int8_t total = malloc(sizeof(struct rg_8bit));
-                total->sz = 8;
-                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
-                bin_clear(&c);
-                bin_clear(&d);
-                return total;
-            }
-        case 16:
-            {
-                bin_int16_t c = bin_int_resize(a, 16);
-                bin_int16_t d = bin_int_resize(b, 16);
-                bin_int16_t total = malloc(sizeof(struct rg_16bit));
-                total->sz = 16;
-                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
-                bin_clear(&c);
-                bin_clear(&d);
-                return total;
-            }
-        case 32:
-            {
-                bin_int32_t c = bin_int_resize(a, 32);
-                bin_int32_t d = bin_int_resize(b, 32);
-                bin_int32_t total = malloc(sizeof(struct rg_32bit));
-                total->sz = 32;
-                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
-                bin_clear(&c);
-                bin_clear(&d);
-                return total;
-            }
-        case 64:
-            {
-                bin_int64_t c = bin_int_resize(a, 64);
-                bin_int64_t d = bin_int_resize(b, 64);
-                bin_int64_t total = malloc(sizeof(struct rg_64bit));
-                total->sz = 64;
-                bin_bit_add(total->bit, c->bit, d->bit, total->sz);
-                bin_clear(&c);
-                bin_clear(&d);
-                return total;
-            }
-    }
+    bin_intn_t total = bin_int_malloc(size_max);
+    bin_intn_t c = bin_int_resize(a, size_max);
+    bin_intn_t d = bin_int_resize(b, size_max);
+
+    bin_bit_add(total->bit, c->bit, d->bit, total->sz);
+
+    bin_clear(&c);
+    bin_clear(&d);
+
+    return total;
 }
 
 void bin_int_add_print(void * a, void * b){
