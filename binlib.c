@@ -222,6 +222,8 @@ void bin_int_add_print(void * a, void * b){
     printf("\t");                                   bin_print(result);
     printf("\n");
 
+    bin_clear(&bigger);
+    bin_clear(&smaller);
     bin_clear(&result);
 
 }
@@ -235,10 +237,6 @@ unsigned bin_to_uint(void * a){
         a_int += (*a_adr)->bit[i] << i;
 
     return a_int;
-}
-
-void bin_bit_cpy(bool * src, bool * dest, int sz){
-    memcpy(dest, src, sz * sizeof(bool));
 }
 
 int bin_two_complement(void * a){
@@ -260,6 +258,7 @@ int bin_two_complement(void * a){
         bin_bit_add(bit, bit, bit_complement, a_size);
 
         int int_signed = (-1) * bin_to_uint(a_copy);
+        bin_clear(&a_copy);
 
         return int_signed;
         
