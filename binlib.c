@@ -107,14 +107,22 @@ static void bin_bit_clear(bool * bit, int sz){
         bit[i] = 0;
 }
 
+void bin_bit_invert(bool * bit, int sz){
+    for(int i = 0; i < sz; i++)
+        bit[i] = !bit[i];
+}
+
 void * bin_int_resize(void * a, int size_new){
     bin_intn_t * a_adr = &a;
+    int a_size = (*a_adr)->sz;
 
     switch(size_new){
         case 8:
             {
                 bin_int8_t total = malloc(sizeof(struct rg_8bit));
                 bin_bit_clear(total->bit, 8);
+                if((*a_adr)->bit[a_size - 1])
+                    bin_bit_invert(total->bit, 8); 
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 8;
                 return total;
@@ -123,14 +131,19 @@ void * bin_int_resize(void * a, int size_new){
             {
                 bin_int16_t	total = malloc(sizeof(struct rg_16bit));
                 bin_bit_clear(total->bit, 16);
+                if((*a_adr)->bit[a_size - 1])
+                    bin_bit_invert(total->bit, 16); 
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 16;
+                //bin_print(total);
                 return total;
             }
         case 32:
             {
                 bin_int32_t total = malloc(sizeof(struct rg_32bit));
                 bin_bit_clear(total->bit, 32);
+                if((*a_adr)->bit[a_size - 1])
+                    bin_bit_invert(total->bit, 32); 
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz*sizeof(bool));
                 total->sz = 32;
                 return total;
@@ -139,6 +152,8 @@ void * bin_int_resize(void * a, int size_new){
             {
                 bin_int64_t total = malloc(sizeof(struct rg_64bit));
                 bin_bit_clear(total->bit, 64);
+                if((*a_adr)->bit[a_size - 1])
+                    bin_bit_invert(total->bit, 64); 
                 memcpy(total->bit, (*a_adr)->bit, (*a_adr)->sz);
                 total->sz = 64;
                 return total;
@@ -265,17 +280,18 @@ unsigned bin_to_uint(void * a){
     return a_int;
 }
 
-void bin_bit_invert(bool * bit, int sz){
-    for(int i = 0; i < sz; i++)
-        bit[i] = !bit[i];
+void bin_bit_cpy(bool * src, bool * dest, int sz){
+    memcpy(dest, src, sz * sizeof(bool));
 }
 
 int bin_two_complement(void * a){
     int a_size = bin_int_size(a);
     bin_intn_t * a_adr = &a;
 
-    bool * bit = (*a_adr)->bit;
+    bin_intn_t b = bin_int_resize(*a_adr, a_size);
+    bool * bit = b->bit;
     bool sign = bit[a_size-1];
+
 
     if(sign){
         bool bit_complement[a_size];
@@ -286,7 +302,7 @@ int bin_two_complement(void * a){
         bin_bit_invert(bit, a_size-1);
         bin_bit_add(bit, bit, bit_complement, a_size);
 
-        int int_signed = (-1) * bin_to_uint(a);
+        int int_signed = (-1) * bin_to_uint(b);
 
         return int_signed;
         
