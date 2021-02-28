@@ -15,12 +15,21 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-void bin_print(void * ar){
-    bin_intn_t * ar_adr = &ar;
-    int sz = (*ar_adr)->sz;
+static
+int bin_int_size(void * a){
+    bin_intn_t * a_adr = &a;
+    int a_size = (*a_adr)->sz;
+
+    return a_size;
+}
+
+void bin_print(void * a){
+    bin_intn_t * a_adr = &a;
+    bool * a_bit = (*a_adr)->bit;
+    int sz = bin_int_size(a);
 
     for(int i = sz - 1; i >= 0; i--)
-        printf("%d", (*ar_adr)->bit[i]);
+        printf("%d", a_bit[i]);
     printf("\n");
 }
 
@@ -31,7 +40,7 @@ void bin_clear(void ** bin){
     }
 }
 
-static
+static inline
 bool char_to_bool(char c){
     return (bool)(c - '0');
 }
@@ -105,6 +114,7 @@ static
 void bin_bit_add(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
     int total;
     int rmd = 0;
+
     for(int i = 0; i < size; i++){
         total = a_bit[i] + b_bit[i] + rmd;	
 
@@ -135,14 +145,13 @@ void * bin_int_resize(void * a, int size_new){
     bin_intn_t total;
     bin_intn_t * a_adr = &a;
 
-    total = bin_int_malloc(size_new);
-
-    int a_size = (*a_adr)->sz;
     bool * a_bit = (*a_adr)->bit;
+    int a_size = bin_int_size(a);
     bool a_sign = a_bit[a_size - 1];
 
-
+    total = bin_int_malloc(size_new);
     bin_bit_clear(total->bit, size_new);
+
     if(a_sign)
         bin_bit_invert(total->bit, size_new); 
 
@@ -150,14 +159,6 @@ void * bin_int_resize(void * a, int size_new){
     total->sz = size_new;
 
     return total;
-}
-
-static
-int bin_int_size(void * a){
-    bin_intn_t * a_adr = &a;
-    int a_size = (*a_adr)->sz;
-
-    return a_size;
 }
 
 static 
@@ -222,7 +223,6 @@ void bin_int_add_print(void * a, void * b){
     printf("\t");                                   bin_print(result);
     printf("\n");
 
-    bin_clear(&bigger);
     bin_clear(&smaller);
     bin_clear(&result);
 
