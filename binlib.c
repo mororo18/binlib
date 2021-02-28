@@ -1,3 +1,11 @@
+/**
+    ================================
+    filename: binlib.c
+    date: feb-24-2021
+    creator: Victor Mororo
+    ================================
+**/
+
 #ifndef _BINLIB_H
 #define _BINLIB_H
 
@@ -36,7 +44,8 @@ static void str_to_bool(const char * src, bool * ar, int sz){
 
 }
 
-void * bin_int_assign(const char * src){
+void * bin_int_assign(const char * bin_str){
+    char * src = bin_str;
     int size = strlen(src);
 
     if(size % 8){
@@ -77,7 +86,7 @@ void * bin_int_assign(const char * src){
     }
 }
 
-void bin_bit_print(bool * bit, int sz){
+static void bin_bit_print(bool * bit, int sz){
     for(int i = 0; i < sz; i++)
         printf("%d", bit[i]);
     printf("\n");
@@ -98,8 +107,6 @@ static void bin_bit_add(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
         }
     }
 
-    //bin_bit_print(a_bit, size);
-    //bin_bit_print(b_bit, size);
 }
 
 static void bin_bit_clear(bool * bit, int sz){
@@ -107,7 +114,7 @@ static void bin_bit_clear(bool * bit, int sz){
         bit[i] = 0;
 }
 
-void bin_bit_invert(bool * bit, int sz){
+static void bin_bit_invert(bool * bit, int sz){
     for(int i = 0; i < sz; i++)
         bit[i] = !bit[i];
 }
@@ -247,7 +254,7 @@ void bin_int_add_print(void * a, void * b){
         dif /= 8;
 
         bigger = a;
-        smaller = b;
+        smaller = bin_int_resize(b, a_size);
         bigger_size = a_size;
 
     }else{
@@ -255,12 +262,12 @@ void bin_int_add_print(void * a, void * b){
         dif = b_size - a_size;
         dif /= 8;
         bigger = b;
-        smaller = a;
+        smaller = bin_int_resize(a, b_size);
         bigger_size = b_size;
     }
 
     printf("\t");                                   bin_print(bigger);
-    printf("      + "); while(dif--) printf("\t");  bin_print(smaller);
+    printf("      + ");                             bin_print(smaller);
     printf("\t");       while(bigger_size--) printf("="); printf("\n");
     printf("\t");                                   bin_print(result);
     printf("\n");
