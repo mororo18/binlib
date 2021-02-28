@@ -156,16 +156,12 @@ void * bin_int_resize(void * a, int size_new){
         bin_bit_invert(total->bit, size_new); 
 
     memcpy(total->bit, a_bit, a_size);
-    total->sz = size_new;
 
     return total;
 }
 
 static 
 int bin_int_size_larger(void * a, void * b){
-    bin_intn_t * a_adr = &a;
-    bin_intn_t * b_adr = &b;
-
     int a_size = bin_int_size(a);
     int b_size = bin_int_size(b);
     int tbl[] = {a_size, b_size};
@@ -209,9 +205,9 @@ void bin_int_add_print(void * a, void * b){
         bigger_size = a_size;
 
     }else{
-
         dif = b_size - a_size;
         dif /= 8;
+
         bigger = b;
         smaller = bin_int_resize(a, b_size);
         bigger_size = b_size;
@@ -268,16 +264,18 @@ int bin_two_complement(void * a){
 }
 
 int bin_to_int(void * a){
-    int a_int = 0;
+    int a_int;
     int a_size = bin_int_size(a);
     bin_intn_t * a_adr = &a;
 
     bool sign = (*a_adr)->bit[a_size-1];
 
     if(sign)
-        return bin_two_complement(a);
+        a_int = bin_two_complement(a);
     else
-        return bin_to_uint(a);
+        a_int = bin_to_uint(a);
+
+    return a_int;
 }
 
 void * bin_from_uint(unsigned a_int, int rg_size){
