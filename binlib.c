@@ -31,11 +31,13 @@ void bin_clear(void ** bin){
     }
 }
 
-static bool char_to_bool(char c){
+static
+bool char_to_bool(char c){
     return (bool)(c - '0');
 }
 
-static void str_to_bool(const char * src, bool * ar, int sz){
+static
+void str_to_bool(const char * src, bool * ar, int sz){
     int str_len = strlen(src);
 
     for(int i = str_len - 1, j = 0; i >= 0; i--, j++){
@@ -44,7 +46,8 @@ static void str_to_bool(const char * src, bool * ar, int sz){
 
 }
 
-static void * bin_int_malloc(int size){
+static
+void * bin_int_malloc(int size){
     bin_intn_t total;
 
     switch(size){
@@ -91,13 +94,15 @@ void * bin_int_assign(const char * bin_str){
     return value;
 }
 
-static void bin_bit_print(bool * bit, int sz){
+static
+void bin_bit_print(bool * bit, int sz){
     for(int i = 0; i < sz; i++)
         printf("%d", bit[i]);
     printf("\n");
 }
 
-static void bin_bit_add(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
+static
+void bin_bit_add(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
     int total;
     int rmd = 0;
     for(int i = 0; i < size; i++){
@@ -114,12 +119,14 @@ static void bin_bit_add(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
 
 }
 
-static void bin_bit_clear(bool * bit, int sz){
+static
+void bin_bit_clear(bool * bit, int sz){
     for(int i = 0; i < sz; i++)
         bit[i] = 0;
 }
 
-static void bin_bit_invert(bool * bit, int sz){
+static 
+void bin_bit_invert(bool * bit, int sz){
     for(int i = 0; i < sz; i++)
         bit[i] = !bit[i];
 }
@@ -145,14 +152,16 @@ void * bin_int_resize(void * a, int size_new){
     return total;
 }
 
-static int bin_int_size(void * a){
+static
+int bin_int_size(void * a){
     bin_intn_t * a_adr = &a;
     int a_size = (*a_adr)->sz;
 
     return a_size;
 }
 
-static int bin_int_size_larger(void * a, void * b){
+static 
+int bin_int_size_larger(void * a, void * b){
     bin_intn_t * a_adr = &a;
     bin_intn_t * b_adr = &b;
 
@@ -233,11 +242,11 @@ void bin_bit_cpy(bool * src, bool * dest, int sz){
 }
 
 int bin_two_complement(void * a){
-    int a_size = bin_int_size(a);
-    bin_intn_t * a_adr = &a;
 
-    bin_intn_t b = bin_int_resize(*a_adr, a_size);
-    bool * bit = b->bit;
+    int a_size = bin_int_size(a);
+    bin_intn_t a_copy = bin_int_resize(a, a_size);
+    bool * bit = a_copy->bit;
+
     bool sign = bit[a_size-1];
 
 
@@ -250,7 +259,7 @@ int bin_two_complement(void * a){
         bin_bit_invert(bit, a_size-1);
         bin_bit_add(bit, bit, bit_complement, a_size);
 
-        int int_signed = (-1) * bin_to_uint(b);
+        int int_signed = (-1) * bin_to_uint(a_copy);
 
         return int_signed;
         
