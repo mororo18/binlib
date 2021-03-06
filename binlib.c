@@ -56,6 +56,12 @@ void str_to_bool(const char * src, bool * ar, int sz){
 }
 
 static
+void bin_bit_clear(bool * bit, int sz){
+    for(int i = 0; i < sz; i++)
+        bit[i] = 0;
+}
+
+static
 void * bin_int_malloc(int size){
     bin_intn_t total;
 
@@ -83,6 +89,7 @@ void * bin_int_malloc(int size){
     }
 
     total->sz = size;
+    bin_bit_clear(total->bit, size);
 
     return total;
 }
@@ -91,7 +98,7 @@ void * bin_int_assign(const char * bin_str){
     char * src = bin_str;
     int size = strlen(src);
 
-    if(size % 8){
+    if(size % 8 || size > 64){
         fprintf(stderr, "[!!] error: in function \033[1m\'bin_int_assign\'\033[0m.\n"
                 "     Invalid lenght={\033[1;31m%d\033[0m} of the passed string={\033[1;31m%s\033[0m}.\n", size, src);
         exit(1);
@@ -129,12 +136,6 @@ void bin_bit_add(bool * dest_bit, bool * a_bit, bool * b_bit, int size){
 
 }
 
-static
-void bin_bit_clear(bool * bit, int sz){
-    for(int i = 0; i < sz; i++)
-        bit[i] = 0;
-}
-
 static 
 void bin_bit_invert(bool * bit, int sz){
     for(int i = 0; i < sz; i++)
@@ -150,7 +151,7 @@ void * bin_int_resize(void * a, int size_new){
     bool a_sign = a_bit[a_size - 1];
 
     total = bin_int_malloc(size_new);
-    bin_bit_clear(total->bit, size_new);
+    //bin_bit_clear(total->bit, size_new);
 
     if(a_sign)
         bin_bit_invert(total->bit, size_new); 
@@ -317,6 +318,103 @@ void * bin_from_int(int a_int, int rg_size){
     }
 
     return temp;
+}
+
+void bin_bit_move(void * a, int delta){
+    int a_size = bin_int_size(a);
+    bin_intn_t * a_adr = &a;
+    bool * a_bit = (*a_adr)->bit;
+
+    if(delta < 0){
+        int a_size_sub = a_size + delta;
+        memmove(a_bit, a_bit - delta, a_size_sub * sizeof(bool));
+
+        for(int i = a_size_sub; i < a_size; i++)
+            a_bit[i] = 0;
+    }else if(delta > 0){
+        int a_size_sub = a_size - delta;
+        memmove(a_bit + delta, a_bit, a_size_sub * sizeof(bool));
+
+        for(int i = 0; i < delta; i++)
+            a_bit[i] = 0;
+    }
+}
+
+int bin_bit_set_count(void * a){
+    bin_intn_t * a_adr = &a;
+    int a_size = bin_int_size(a);
+    bool * a_bit = (*a_adr)->bit;
+    int count = 0;
+
+    for(int i = 0; i < a_size; i++)
+        if(a_bit[i])
+            count++;
+
+    return count;
+}
+
+int bin_size_fit(int size){
+    if(size <= 8)
+        return 8;
+    else if(size <= 16)
+        return 16;
+    else if(size <= 32)
+        return 32;
+    else if(size <= 64)
+        return 64;
+    else
+        fprintf(stderr, "[!!] error: in function \033[1m\'bin_size_fit\'\033[0m.\n"
+                "     Invalid size={\033[1;31m%dbits\033[0m}. Max size support is 64bits.\n",size);
+        
+}
+
+void * bin_int_multiply(void * a, void * b){
+    bin_intn_t result;
+    bin_intn_t buffer;
+    bin_intn_t bigger;
+    bin_intn_t smaller;
+    int a_size = bin_int_size(a);
+    int b_size = bin_int_size(b);
+    int result_size;
+    int increasement;
+
+    if(a_size < b_size){
+        increasement = a_size - 1;
+        result_size = b_size + increasement;
+        bigger = b;
+        smaller = a;
+    }else{
+        increasement = b_size - 1;
+        result_size = a_size + increasement;
+        bigger = a;
+        smaller = b;
+    }
+
+    if(result_size > 64)    {
+        fprintf(stderr, "[!!] error: in function \033[1m\'bin_int_multiply\'\033[0m.\n"
+                "     Invalid size={\033[1;31m%dbits\033[0m}. Can't support the result of the multiplication between \'%dbits\' and \'%dbits\'.\n",
+                result_size, a_size, b_size);
+        exit(1);
+    }
+
+    result = bin_int_malloc(bin_size_fit(result_size)); 
+    buffer = bin_int_resize(bigger, bin_size_fit(result_size)); 
+
+    int itert = bin_int_size(smaller);
+    bool * bit = smaller->bit;
+
+    for(int i = 0; i < itert; i++){
+        bin_bit_move(buffer, (bool)i);
+        if(!bit[i])
+            continue;
+        
+        bin_bit_add(result->bit, result->bit, buffer->bit, result->sz);
+    }
+
+    bin_clear(&buffer);
+
+    return result;
+
 }
 
 #endif

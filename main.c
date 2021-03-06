@@ -2,7 +2,7 @@
 #include "binlib.h"
 
 int main(){
-    bin_int16_t a = bin_int_assign("00000101");
+    bin_int16_t a = bin_int_assign("11010101");
     bin_int32_t b = bin_int_assign("1111111111111111");
     bin_int32_t c;
 
@@ -31,10 +31,16 @@ int main(){
     // free the current memory allocated for this binary;
     bin_clear(&c);
     // return a pointer with binary with 8bit size for signed integers (-127);
-    c = bin_from_int(-127, 8);
+    c = bin_from_int(-1, 8);
     // print with its news size and value;
-    bin_print(c);
+    bin_int8_t d = bin_int_assign("01010101");
+    bin_int8_t e = bin_int_assign("00010101");
+    bin_int16_t f = bin_int_multiply(d, e);
 
+    printf("\nMultiplication of Binaries (unsigned integers):\n\n");
+    printf(" (D) %dbit binary : \t\t", d->sz);  bin_print(d);
+    printf(" (E) %dbit binary : \t\t", e->sz);      bin_print(e);
+    printf("(D*E)%dbit binary : \t", f->sz);      bin_print(f);
     //printf("uint u %u\n", bin_to_uint(a));
     //printf("uint d %d\n", bin_to_int(a));
 	//bin_int_add_print(a, b);
