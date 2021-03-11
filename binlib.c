@@ -225,7 +225,7 @@ void bin_int_add_print(void * a, void * b){
 
 }
 
-unsigned bin_to_uint(void * a){
+unsigned bin_uint_to_dec(void * a){
     unsigned a_int = 0;
     int a_size = bin_int_size(a);
     bin_intn_t * a_adr = &a;
@@ -254,7 +254,7 @@ int bin_two_complement(void * a){
         bin_bit_invert(bit, a_size-1);
         bin_bit_add(bit, bit, bit_complement, a_size);
 
-        int int_signed = (-1) * bin_to_uint(a_copy);
+        int int_signed = (-1) * bin_uint_to_dec(a_copy);
         bin_clear(&a_copy);
 
         return int_signed;
@@ -264,7 +264,7 @@ int bin_two_complement(void * a){
     }
 }
 
-int bin_to_int(void * a){
+int bin_int_to_dec(void * a){
     int a_int;
     int a_size = bin_int_size(a);
     bin_intn_t * a_adr = &a;
@@ -274,12 +274,12 @@ int bin_to_int(void * a){
     if(sign)
         a_int = bin_two_complement(a);
     else
-        a_int = bin_to_uint(a);
+        a_int = bin_uint_to_dec(a);
 
     return a_int;
 }
 
-void * bin_from_uint(unsigned a_int, int rg_size){
+void * bin_uint_from_dec(unsigned a_int, int rg_size){
     char buff[rg_size+1];
     int quoc = a_int;
     int i = rg_size;
@@ -299,10 +299,10 @@ void * bin_from_uint(unsigned a_int, int rg_size){
     return bin_int_assign(buff);
 }
 
-void * bin_from_int(int a_int, int rg_size){
+void * bin_int_from_dec(int a_int, int rg_size){
     bin_intn_t temp;
     if(a_int < 0){
-        temp = bin_from_uint((-1)* a_int, rg_size);
+        temp = bin_uint_from_dec((-1)* a_int, rg_size);
         bin_bit_invert(temp->bit, temp->sz);
 
         bool comp[rg_size];
@@ -313,7 +313,7 @@ void * bin_from_int(int a_int, int rg_size){
 
     }else{
 
-        temp = bin_from_uint(a_int, rg_size);
+        temp = bin_uint_from_dec(a_int, rg_size);
 
     }
 

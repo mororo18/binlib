@@ -20,18 +20,18 @@ int main(){
 	bin_int_add_print(a, b);
 
     printf("\nConvert binary to int:\n\n");
-    printf(" (A) %dbit int : %d\n", a->sz, bin_to_int(a));      
-    printf(" (B) %dbit int : %d\n", b->sz, bin_to_int(b)); 
-    printf("(A+B)%dbit int : %d\n", c->sz, bin_to_int(c));    
+    printf(" (A) %dbit int : %d\n", a->sz, bin_int_to_dec(a));      
+    printf(" (B) %dbit int : %d\n", b->sz, bin_int_to_dec(b)); 
+    printf("(A+B)%dbit int : %d\n", c->sz, bin_int_to_dec(c));    
 
     printf("\nConvert binary to uint:\n\n");
-    printf(" (A) %dbit int : %u\n", a->sz, bin_to_uint(a));      
-    printf(" (B) %dbit int : %u\n", b->sz, bin_to_uint(b)); 
-    printf("(A+B)%dbit int : %u\n", c->sz, bin_to_uint(c));    
+    printf(" (A) %dbit int : %u\n", a->sz, bin_uint_to_dec(a));      
+    printf(" (B) %dbit int : %u\n", b->sz, bin_uint_to_dec(b)); 
+    printf("(A+B)%dbit int : %u\n", c->sz, bin_uint_to_dec(c));    
     // free the current memory allocated for this binary;
     bin_clear(&c);
     // return a pointer with binary with 8bit size for signed integers (-127);
-    c = bin_from_int(-1, 8);
+    c = bin_int_from_dec(-1, 8);
     // print with its news size and value;
     bin_int8_t d = bin_int_assign("01010101");
     bin_int8_t e = bin_int_assign("00010101");

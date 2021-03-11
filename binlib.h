@@ -30,9 +30,9 @@ void    bin_print(void *);
 void *  bin_int_add(void * a_bin_int_type, void * b_bin_int_type);
 void    bin_int_add_print(void * a_bin_int_type, void * b_bin_int_type);
 
-unsigned bin_to_uint(void * bin_int_type);
-int     bin_to_int(void * bin_int_type);
-void *  bin_from_uint(unsigned a_int, int rg_size);
-void *  bin_from_int(int a_int, int rg_size);
+unsigned bin_uint_to_dec(void * bin_int_type);
+int     bin_int_to_dec(void * bin_int_type);
+void *  bin_uint_from_dec(unsigned a_int, int rg_size);
+void *  bin_int_from_dec(int a_int, int rg_size);
 void    bin_bit_shift(void * a, int delta);
 void *  bin_int_multiply(void * a, void * b);
