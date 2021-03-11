@@ -320,7 +320,7 @@ void * bin_from_int(int a_int, int rg_size){
     return temp;
 }
 
-void bin_bit_move(void * a, int delta){
+void bin_bit_shift(void * a, int delta){
     int a_size = bin_int_size(a);
     bin_intn_t * a_adr = &a;
     bool * a_bit = (*a_adr)->bit;
@@ -404,7 +404,7 @@ void * bin_int_multiply(void * a, void * b){
     bool * bit = smaller->bit;
 
     for(int i = 0; i < itert; i++){
-        bin_bit_move(buffer, (bool)i);
+        bin_bit_shift(buffer, (bool)i);
         if(!bit[i])
             continue;
         

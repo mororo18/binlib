@@ -34,5 +34,5 @@ unsigned bin_to_uint(void * bin_int_type);
 int     bin_to_int(void * bin_int_type);
 void *  bin_from_uint(unsigned a_int, int rg_size);
 void *  bin_from_int(int a_int, int rg_size);
-void    bin_bit_move(void * a, int delta);
+void    bin_bit_shift(void * a, int delta);
 void *  bin_int_multiply(void * a, void * b);
